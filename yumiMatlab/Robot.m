@@ -40,6 +40,8 @@ classdef Robot < handle
             (44.0 / 180.0) * 3.14*0;
             (54.0 / 180.0) * 3.14*0;
             (-3.0 / 180.0) * 3.14*0;
+            0;
+            0;
             -(46.0 / 180.0) * 3.14;
             (-121.0 / 180.0) * 3.14;
             -(-87.0 / 180.0) * 3.14;
@@ -47,6 +49,8 @@ classdef Robot < handle
             -(44.0 / 180.0) * 3.14*0;
             (54.0 / 180.0) * 3.14*0;
             (-3.0 / 180.0) * 3.14*0;
+            0;
+            0;
             ];
     end
 
@@ -58,12 +62,12 @@ classdef Robot < handle
             assert(strcmp(name, 'yumi'), 'name must be a char array of a supported robot. Supported robots: yumi')
             obj.name = name;
             p = which('Robot.m');
-            directory = p(1:max(find(p=='\',9999)));  
+            directory = p(1:max(find(p==filesep,9999)));  
             [obj.robotPtr, obj.numJoints, obj.numBodies, obj.jointNames,...
                 obj.bodyNames,obj.numEndEffector, obj.jointMinimums, obj.jointMaximums] ...
-                = robot_mex(obj.INIT, [directory name]);
-obj.jointMinimums = obj.jointMinimums + .25;
-obj.jointMaximums = obj.jointMaximums - .25;
+                = robot_mex(obj.INIT, fullfile(directory, name));
+% obj.jointMinimums = obj.jointMinimums + .25;
+% obj.jointMaximums = obj.jointMaximums - .25;
 
             if exist([directory 'obj.mat']) == 2
                 tmp = load([directory 'obj.mat']);
@@ -235,7 +239,7 @@ obj.jointMaximums = obj.jointMaximums - .25;
             axis equal
             ylim([-.7 .7])
             xlim([-.5 .9])
-            zlim([-0 1.2])
+            zlim([-.1 1.2])
             view(120, 15)
             colormap gray
             shading interp
