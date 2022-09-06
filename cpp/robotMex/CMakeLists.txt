@@ -1,0 +1,35 @@
+set(TARGET robot_mex)
+
+SET(CMAKE_BUILD_TYPE RelWithDebInfo)
+
+find_package(RL REQUIRED)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+INCLUDE_DIRECTORIES(${MATLAB_INCLUDE_DIR})
+
+add_library(${TARGET} SHARED robot_mex.cpp ${CMAKE_SOURCE_DIR}/Matlabdef.def)
+
+add_definitions(-std=c++17)
+
+target_link_libraries(${TARGET}
+					${MATLAB_LIBRARIES}
+                    ${RL_LIBRARIES} )
+
+if(WIN32)
+    SET_TARGET_PROPERTIES(${TARGET} PROPERTIES SUFFIX .mexw64)
+else(WIN32)
+    if (CMAKE_SIZEOF_VOID_P MATCHES "8")
+        SET_TARGET_PROPERTIES(${TARGET} PROPERTIES SUFFIX .mexa64 PREFIX "")
+    else(CMAKE_SIZEOF_VOID_P MATCHES "8")
+        SET_TARGET_PROPERTIES(${TARGET} PROPERTIES SUFFIX .mexglx PREFIX "")
+    endif (CMAKE_SIZEOF_VOID_P MATCHES "8")
+endif(WIN32)
+
+#SET_TARGET_PROPERTIES(${TARGET}
+#        PROPERTIES
+#        CUDA_SEPERABLE_COMPILATION ON
+#LINKER_LANGUAGE CUDA)
+
+install(TARGETS ${TARGET} DESTINATION ${CMAKE_SOURCE_DIR}/../mex)
+
+message(Done!!! ${TARGET})
