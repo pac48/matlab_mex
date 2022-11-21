@@ -16,6 +16,7 @@ IF(MATLAB_FOUND)
     message(STATUS "MATLAB Found, MATLAB MEX will be compiled.")
     add_subdirectory(robotMex)
     add_subdirectory(objLoaderMex)
+    add_subdirectory(parser)
 
 ELSE(MATLAB_FOUND)
     message( FATAL_ERROR "MATLAB not found...nothing will be built." )
