@@ -1,13 +1,20 @@
 classdef Robot < handle
+    % export obj as +z up and +y forward
 
     properties(Constant, Access=private)
         INIT = 0
         DESTROY = 1
         SETJOINTS = 2
         GETJOINTS = 3
-        GETJACOB = 4;
-        GETTRANS = 5
-        GETOPPOS = 6;
+        GETJACOB = 4
+        GETBODYTRANS = 5
+        GETJOINTTRANS = 6
+        GETOPPOS = 7 % operational position
+        GETJOINTTREE = 8
+        REVOLUTE = 9
+        PRISMATIC = 10
+        FIXED = 11;
+
     end
 
     properties(Access=private)
@@ -16,7 +23,6 @@ classdef Robot < handle
         vertsNormals
         vertsNames
         body2VertMap
-        startInd
         directory
         timerObj
         hSpinner
@@ -25,248 +31,304 @@ classdef Robot < handle
     end
 
     properties
-        name
-        numBodies
-        bodyNames
-        bodyNamesMap
         numJoints
+        numBodies
         jointNames
-        jointNamesMap
+        bodyNames
         numEndEffector
         jointMinimums
         jointMaximums
-        home = [(46.0 / 180.0) * 3.14;
-            (-121.0 / 180.0) * 3.14;
-            pi/4+(-87.0 / 180.0) * 3.14;
-            (4.0 / 180.0) * 3.14;
-            (44.0 / 180.0) * 3.14*0;
-            (54.0 / 180.0) * 3.14;
-            (-3.0 / 180.0) * 3.14*0;
-            0;
-            0;
-            -(46.0 / 180.0) * 3.14;
-            (-121.0 / 180.0) * 3.14;
-            -(-87.0 / 180.0) * 3.14;
-            (4.0 / 180.0) * 3.14;
-            -(44.0 / 180.0) * 3.14*0;
-            (54.0 / 180.0) * 3.14*0;
-            (-3.0 / 180.0) * 3.14*0;
-            0;
-            0;
-            ];
-        miminJointMap
+        home 
+        bodies
+        armInds
+        armVerts2Body
+        controlVertInds
+        controlBodyInds
+        intervals
+        controlPoints
+        name
     end
 
     methods
-        function obj = Robot(name)
-            % Constructor for robot object. Creates a robot object pointed
-            % to by robotPtr. This method also caches values for efficiency.
-
-            assert(strcmp(name, 'yumi'), 'name must be a char array of a supported robot. Supported robots: yumi')
+        function obj = Robot(name, homeDict, controlPoints)
             obj.name = name;
+            obj.controlPoints = controlPoints;
+
             p = which('Robot.m');
-            directory = p(1:max(find(p==filesep,9999)));
+            pathparts = strsplit(p, filesep);
+            directory = fullfile(filesep, pathparts{1:end-1});
+            urdfName = fullfile(directory, [name '.urdf']);
+            objName = fullfile(directory, [name '.obj']);
+
             [obj.robotPtr, obj.numJoints, obj.numBodies, obj.jointNames,...
                 obj.bodyNames,obj.numEndEffector, obj.jointMinimums, obj.jointMaximums] ...
-                = robot_mex(obj.INIT, fullfile(directory, name));
+                = robot_mex(obj.INIT, urdfName);
+            [points, verts, vertsNormals, verticesTextureCoordinates, vertsNames] = object_loader(objName);
+            vertsNames = cellfun(@(x) x(find(x =='_',1)+1:end), vertsNames,'UniformOutput',false);
 
-            obj.bodyNamesMap = containers.Map(obj.bodyNames, num2cell(1:obj.numBodies));
-            obj.jointNamesMap = containers.Map(obj.jointNames, num2cell(1:obj.numJoints));
-            obj.miminJointMap = containers.Map();
-            for i = 1:length(obj.jointNames)
-                jointName = obj.jointNames{i};
-                if length(jointName) > 2 && strcmp(jointName(end-1:end), '_m')
-                    tmp = cellfun(@(x) strcmp(x, jointName(1:end-2)), obj.jointNames);
-                    is_mimic = any(tmp);
-                    if is_mimic
-                        ind = find(tmp,1);
-                        mimicedJointName = obj.jointNames{ind};
-                        obj.miminJointMap(mimicedJointName) = i;
-                    end
-                end
-            end
-
-            if exist([directory 'obj.mat']) == 2
-                tmp = load([directory 'obj.mat']);
-                obj.verts = tmp.verts;
-                obj.vertsNames = tmp.vertsNames;
-                obj.vertsNormals = tmp.vertsNormals;
-            else
-                [points, verts, vertsNormals, verticesTextureCoordinates, vertsNames] = object_loader([directory name '.obj']);
-                vertsNames = cellfun(@(x) x(find(x =='_',1)+1:end), vertsNames,'UniformOutput',false);
-                save([directory 'obj'], 'verts', 'vertsNames','vertsNormals');
-                obj.verts = verts;
-                obj.vertsNormals = vertsNormals;
-                obj.vertsNames = vertsNames;
-            end
+            %             save([directory 'obj'], 'verts', 'vertsNames','vertsNormals');
+            obj.verts = verts;
+            obj.vertsNormals = vertsNormals;
+            obj.vertsNames = vertsNames;
 
             obj.body2VertMap = containers.Map();
             for b = 1:length(obj.bodyNames)
                 tmp = cellfun(@(x) strcmp(obj.bodyNames{b}, x), obj.vertsNames);
                 obj.body2VertMap(obj.bodyNames{b}) = find(tmp,1);
+                ind = find(tmp,1);
+                if ~isempty(ind)
+                    obj.bodies{b} = obj.verts{ind};
+                end
             end
 
+            obj.home = arrayfun(@(x) homeDict(x), obj.jointNames);
             obj.setJoints(obj.home)
-            obj.startInd = 1;
+            obj.intervals = cumsum(cellfun(@(x) size(x,1), obj.verts));
+            obj.intervals = cat(1,1, obj.intervals);
+
+            [verts, ~, ~] = obj.forwardRender();
+            for i = 1:size(obj.controlPoints,2)
+                tmp = sum((verts-obj.controlPoints(:,i)).^2,1);
+                obj.controlVertInds(i) = find(tmp==min(tmp),1);
+                obj.controlBodyInds(i) = find(obj.controlVertInds(i) > obj.intervals, 1, 'last' );
+            end
+
+
+
+
+            %                        [~, ~, ~, robotArmInds]  = obj.getRobotVerts();
+            %             obj.armInds = robotArmInds(indsSawyer);
+            %             obj.armVerts2Body = zeros(size(obj.armInds));
+
+
+            %             return
+            %
+            %             tmp = load([pwd '\correspondenceNet\inds_sawyer.mat']);
+            %             indsSawyer = tmp.inds; % inds specifying alligned arms verts
+            %
+            %
+            %
+            %             for i = 1:numel(obj.armInds)
+            %                 b = find(obj.armInds(i) < intervals, 1);
+            %                 if isempty(b)
+            %                     b = length(intervals);
+            %                 end
+            %                 obj.armVerts2Body(i) = b;
+            %             end
 
         end
-        function delete(obj)
-            % Deletes the allocated robot object. This is called
-            % automatically when obj is deleted.
 
+        %         function [verts, TBase, TEnd, vertsInds]  = getRobotVerts(obj)
+        %             obj.setJoints(obj.home)
+        %
+        %             [verts, ~, ~] = obj.forwardRender();
+        %
+        %             baseBodyInd = 7;
+        %             endBodyInd = 22;
+        %
+        %             vertsInds = [];
+        %             count = 0;
+        %             for b = 1:length(obj.bodies)
+        %                 if b >= baseBodyInd && b <= endBodyInd
+        %                     vertsInds = cat(1, vertsInds,(1:size(obj.bodies{b}, 1))'+count);
+        %                 end
+        %                 count = count + size(obj.bodies{b}, 1);
+        %             end
+        %             verts = verts(:, vertsInds)';
+        %             TBase = obj.getBodyTransform(baseBodyInd);
+        %             TEnd = obj.getBodyTransform(endBodyInd);
+        %         end
+        function delete(obj)
             robot_mex(obj.DESTROY, obj.robotPtr);
         end
-        function setJoints(obj, varargin)
-            % Sets the joint angles for the robot.
-            if length(varargin)==1
-                jointAngles = varargin{1};
-            elseif length(varargin)==2
-                jointAnglesIn = varargin{2};
-                jointAngles = zeros(size(obj.home));
-                jointNamesIn = varargin{1};
-                for i = 1:length(jointNamesIn)
-                    ind = obj.jointNamesMap(jointNamesIn{i});
-                    jointAngles(ind) = jointAnglesIn(i);
-                    if obj.miminJointMap.isKey(jointNamesIn{i})
-                        jointAngles(obj.miminJointMap(jointNamesIn{i})) = jointAngles(ind);
-                    end
-                end
-            else
-                error('wrong nubmer of inputs')
-            end
-
+        function setJoints(obj, jointAngles)
             jointAngles = reshape(jointAngles, [], 1);
             jointAngles = min(jointAngles, obj.jointMaximums);
             jointAngles = max(jointAngles, obj.jointMinimums);
             robot_mex(obj.SETJOINTS, obj.robotPtr, jointAngles);
         end
         function jointAgnles = getJoints(obj)
-            % Gets the current joint angles of the robot
-
             jointAgnles = robot_mex(obj.GETJOINTS, obj.robotPtr);
         end
         function J = getJacobian(obj)
-            % Gets the jacobian for the end effectors. J has 6 rows for
-            % each end effector and one column for each joint.
-
             J = robot_mex(obj.GETJACOB, obj.robotPtr);
         end
-        function T = getTransform(obj, arg)
-            % Gets the tranform from the ith joint to global cooordinates.
-            % The ordeer of the indexing order is the same as the order of
-            % obj.jointNames
-            if isa(arg, "double")
-                i = arg;
-            elseif isa(arg, "char")
-                i = obj.bodyNamesMap(arg);
-            else
-                error("wrong input type")
-            end
-            T = robot_mex(obj.GETTRANS, obj.robotPtr, i);
+        function T = getBodyTransform(obj, index)
+            T = robot_mex(obj.GETBODYTRANS, obj.robotPtr, index);
         end
-        function operationalPosition = getOperationalPosition(obj, i)
-            % Gets the tranform from the ith end effector to global coordinates
-
-            operationalPosition = robot_mex(obj.GETOPPOS, obj.robotPtr, i);
+        function T = getJointTransform(obj, index)
+            T = robot_mex(obj.GETJOINTTRANS, obj.robotPtr, index);
         end
-        function [JeR, JwR, JeL, JwL] = getElbowWristJacobians(obj)
-            % Gets the jacobians for the left and right elbor and wrist
-            % joints. JeR, JwR, JeL, JwL all have 3 rows one column for
-            % each joint.
-
-            assert(strcmp(obj.name, 'yumi'), 'nMethod for yumi robot only');
-
-            R = cell(14, 1);
-            P = cell(14, 1);
-            for i = 1:7
-                % right
-                T = obj.getTransform(i+1);
-                R{i} = T(1:3, 1:3);
-                P{i} = T(1:3, end);
-                % left
-                T = obj.getTransform(i+1+10);
-                R{i+7} = T(1:3, 1:3);
-                P{i+7} = T(1:3, end);
-            end
-
-            JeR = zeros(3, obj.numJoints);
-            for j = 1:2
-                Rj = R{j};
-                JeR(:,j) = cross(Rj(:,3),P{3}-P{j});
-            end
-            JwR = zeros(3, obj.numJoints);
-            for j = 1:4
-                Rj = R{j};
-                JwR(:,j) = cross(Rj(:,3),P{5}-P{j});
-            end
-
-            JeL = zeros(3, obj.numJoints);
-            for j = 1:2
-                Rj = R{j+7};
-                JeL(:,j + obj.numJoints/2) = cross(Rj(:,3), P{3+7}-P{j+7});
-            end
-            JwL = zeros(3, obj.numJoints);
-            for j = 1:4
-                Rj = R{j+7};
-                JwL(:,j + obj.numJoints/2) = cross(Rj(:,3),P{5+7}-P{j+7});
-            end
+        function operationalPosition = getOperationalPosition(obj, index)
+            operationalPosition = robot_mex(obj.GETOPPOS, obj.robotPtr, index);
         end
-        function Jall = getAllJacobians(obj)
-            % Gets the jacobians for all joints. Jall is a cell array of
-            % jacobians for each joint. The sizes are 3 rows and one column
-            % each joint.
+        function [jointInds, jointTypes] = getJointTree(obj, index)
+            [jointInds, jointTypes] = robot_mex(obj.GETJOINTTREE, obj.robotPtr, index);
+        end
+        %         function [JeR, JwR, JeL, JwL] = getElbowWristJacobians(obj)
+        %             R = cell(14, 1);
+        %             P = cell(14, 1);
+        %             for i = 1:7
+        %                 % right
+        %                 T = obj.getBodyTransform(i+1);
+        %                 R{i} = T(1:3, 1:3);
+        %                 P{i} = T(1:3, end);
+        %                 % left
+        %                 T = obj.getBodyTransform(i+1+10);
+        %                 R{i+7} = T(1:3, 1:3);
+        %                 P{i+7} = T(1:3, end);
+        %             end
+        %
+        %             JeR = zeros(3, obj.numJoints);
+        %             for j = 1:2
+        %                 Rj = R{j};
+        %                 JeR(:,j) = cross(Rj(:,3),P{3}-P{j});
+        %             end
+        %             JwR = zeros(3, obj.numJoints);
+        %             for j = 1:4
+        %                 Rj = R{j};
+        %                 JwR(:,j) = cross(Rj(:,3),P{5}-P{j});
+        %             end
+        %
+        %             JeL = zeros(3, obj.numJoints);
+        %             for j = 1:2
+        %                 Rj = R{j+7};
+        %                 JeL(:,j + obj.numJoints/2) = cross(Rj(:,3), P{3+7}-P{j+7});
+        %             end
+        %             JwL = zeros(3, obj.numJoints);
+        %             for j = 1:4
+        %                 Rj = R{j+7};
+        %                 JwL(:,j + obj.numJoints/2) = cross(Rj(:,3),P{5+7}-P{j+7});
+        %             end
+        %         end
+        %         function Jall = getAllJacobians(obj)
+        %             % right side
+        %             jointOffset = 1;
+        %             Jall = cell(length(obj.bodyNames), 1);
+        %             for j = 1:(length(obj.bodyNames)+1)/2
+        %                 J = zeros(3, obj.numJoints);
+        %                 T = obj.getBodyTransform(j);
+        %                 Ptip = T(1:3, end);
+        %                 for i = 1:(j-1-jointOffset)
+        %                     % right
+        %                     if contains(obj.bodyNames{i+jointOffset}, 'gripper')
+        %                         continue
+        %                     end
+        %                     T = obj.getBodyTransform(i+jointOffset);
+        %                     R = T(1:3, 1:3);
+        %                     P = T(1:3, end);
+        %                     J(:, i) = cross(R(:, end) , Ptip - P);
+        %                 end
+        %                 Jall{j} = J;
+        %             end
+        %             % left side
+        %             jointOffset = 10;
+        %             for j = jointOffset+1:length(obj.bodyNames)
+        %                 J = zeros(3, obj.numJoints);
+        %                 T = obj.getBodyTransform(j);
+        %                 Ptip = T(1:3, end);
+        %                 for i = 1:(j-1-jointOffset)
+        %                     % right
+        %                     if contains(obj.bodyNames{i+jointOffset}, 'gripper')
+        %                         continue
+        %                     end
+        %                     T = obj.getBodyTransform(i+jointOffset);
+        %                     R = T(1:3, 1:3);
+        %                     P = T(1:3, end);
+        %                     J(:, i + length(obj.jointNames)/2) = cross(R(:, end) , Ptip - P);
+        %                 end
+        %                 Jall{j} = J;
+        %             end
+        %         end
+        function JControl = getControlPointsJacobians(obj)
+            JControlPoints = obj.getPointJacobians(obj.controlPoints, obj.controlBodyInds);
+            JControl = JControlPoints{1};
+        end
 
-            % right side
-            jointOffset = 1;
-            Jall = cell(length(obj.bodyNames), 1);
-            for j = 1:(length(obj.bodyNames)+1)/2
-                J = zeros(3, obj.numJoints);
-                T = obj.getTransform(j);
-                Ptip = T(1:3, end);
-                for i = 1:(j-1-jointOffset)
+        function JVerts = getPointJacobians(obj, controlPoints, bodyInds)
+            % verts should be 3 x n, e.g. x1,y1,z1,x2,y2,z2...
+            JVerts = cell(size(controlPoints,2), 1);
+
+            jointInds = cell(length(obj.bodyNames), 1);
+            jointTypes = cell(length(obj.bodyNames), 1);
+            for b = 1:length(obj.bodyNames)
+                [jointIndsb, jointTypesb] = obj.getJointTree(obj.bodyNames{b});
+                jointInds{b} = jointIndsb;
+                jointTypes{b} = jointTypesb;
+            end
+
+            for j = 1:length(JVerts)
+                b = bodyInds(j); %obj.armVerts2Body(j);
+%                 b = obj.body2VertMap(obj.bodyNames{bodyInds(j)});
+                jointIndsb = jointInds{b};
+                jointTypesb = jointTypes{b};
+
+                J = zeros(6, obj.numJoints);
+                Ptip = controlPoints(:, j);
+
+                for i = 1:length(jointIndsb)
                     % right
-                    if contains(obj.bodyNames{i+jointOffset}, 'gripper')
+                    if jointTypesb(i) == obj.FIXED
                         continue
                     end
-                    T = obj.getTransform(i+jointOffset);
-                    R = T(1:3, 1:3);
-                    P = T(1:3, end);
-                    J(:, i) = cross(R(:, end) , Ptip - P);
-                end
-                Jall{j} = J;
-            end
-            % left side
-            jointOffset = 10;
-            for j = jointOffset+1:length(obj.bodyNames)
-                J = zeros(3, obj.numJoints);
-                T = obj.getTransform(j);
-                Ptip = T(1:3, end);
-                for i = 1:(j-1-jointOffset)
-                    % right
-                    if contains(obj.bodyNames{i+jointOffset}, 'gripper')
-                        continue
+                    if jointTypesb(i) == obj.REVOLUTE
+                        T = obj.getJointTransform(jointIndsb(i));
+                        R = T(1:3, 1:3);
+                        P = T(1:3, end);
+                        J(1:3, jointIndsb(i)) = cross(R(:, end) , Ptip - P);
+                        J(4:6, jointIndsb(i)) = T(1:3,3);
                     end
-                    T = obj.getTransform(i+jointOffset);
-                    R = T(1:3, 1:3);
-                    P = T(1:3, end);
-                    J(:, i + length(obj.jointNames)/2) = cross(R(:, end) , Ptip - P);
+                    if jointTypesb(i) == obj.PRISMATIC
+                        T = obj.getJointTransform(jointIndsb(i));
+                        J(1:3, jointIndsb(i)) = -T(1:3,1);
+                        J(4:6, jointIndsb(i)) = 0;
+                    end
                 end
-                Jall{j} = J;
+                JVerts{j} = J;
             end
 
         end
-        function plotObject(obj, varargin)
-            % Display the 3D robot configuration. (mainly used for debugging)
 
+        function [verts, normals, RGB] = forwardRender(obj)
+            numVerts = sum(cellfun(@(x) length(x), obj.verts));
+            verts = zeros(numVerts, 4);
+            normals = zeros(numVerts, 3);
+
+            count = 0;
+            for i = 1:length(obj.bodyNames)
+                ind = obj.body2VertMap(obj.bodyNames{i});
+                if isempty(ind)
+                    continue
+                end
+                tmp = obj.verts{ind};
+                tmp2 = obj.vertsNormals{ind};
+                T = obj.getBodyTransform(i);
+                inds = count+(1:size(tmp,1));
+                verts(inds,:) = cat(2, tmp, ones(size(tmp,1), 1))*T';
+                normals(inds,:)  = tmp2*T(1:3,1:3)';
+                count = count + length(inds);
+            end
+            verts = verts(:,1:3)';
+            normals = normals';
+            RGB = .8*ones(size(normals));
+
+
+        end
+
+        function plotObject(obj)
+            % mainly used for debugging
             vNew = [];
             color = [];
             lighDir = [-1; -.5; -1];
             lighDir = lighDir./norm(lighDir);
             for i = 1:length(obj.bodyNames)
                 ind = obj.body2VertMap(obj.bodyNames{i});
+                if isempty(ind)
+                    continue
+                end
                 tmp = obj.verts{ind};
                 tmp2 = obj.vertsNormals{ind};
-                T = obj.getTransform(i);
+                T = obj.getBodyTransform(i);
                 vNew = cat(1, vNew, cat(2, tmp, ones(size(tmp,1), 1))*T');
                 vNormNew = tmp2*T(1:3,1:3)';
                 color = cat(1, color, max(-vNormNew*lighDir, .3));
@@ -277,14 +339,9 @@ classdef Robot < handle
             trisurf(T, vNew(:, 1), vNew(:, 2),  vNew(:, 3), color)
             axis equal
             ylim([-.7 .7])
-            xlim([-.5 .9])
-            zlim([-.1 1.2])
-            if isempty(varargin)
-                view(120, 15)
-            else
-                viewDir = varargin{1}; 
-                view(viewDir)
-            end
+            xlim([-.5 1.3])
+            zlim([-.8 1.2])
+            view(120, 15)
             colormap gray
             shading interp
         end
