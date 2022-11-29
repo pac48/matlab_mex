@@ -147,6 +147,20 @@ classdef Robot < handle
             jointAngles = max(jointAngles, obj.jointMinimums);
             robot_mex(obj.SETJOINTS, obj.robotPtr, jointAngles);
         end
+        function setJointsMsg(obj, msg)
+            jointAngles = obj.getJoints();
+            map = dictionary(msg.Name, msg.Position);
+            ind = 0;
+            for jointName = obj.jointNames'
+                ind =ind + 1;
+                if map.isKey(jointName)
+                    jointAngles(ind) = map(jointName); 
+                end
+            end
+            jointAngles = min(jointAngles, obj.jointMaximums);
+            jointAngles = max(jointAngles, obj.jointMinimums);
+            robot_mex(obj.SETJOINTS, obj.robotPtr, jointAngles);
+        end
         function jointAgnles = getJoints(obj)
             jointAgnles = robot_mex(obj.GETJOINTS, obj.robotPtr);
         end

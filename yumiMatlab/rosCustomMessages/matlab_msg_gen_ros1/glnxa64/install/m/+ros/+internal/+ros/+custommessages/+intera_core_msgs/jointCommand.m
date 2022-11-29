@@ -1,0 +1,41 @@
+function [data, info] = jointCommand
+%JointCommand gives an empty data for intera_core_msgs/JointCommand
+% Copyright 2019-2020 The MathWorks, Inc.
+%#codegen
+data = struct();
+data.MessageType = 'intera_core_msgs/JointCommand';
+[data.Header, info.Header] = ros.internal.ros.messages.std_msgs.header;
+info.Header.MLdataType = 'struct';
+[data.Mode, info.Mode] = ros.internal.ros.messages.ros.default_type('int32',1);
+[data.Names, info.Names] = ros.internal.ros.messages.ros.char('string',NaN);
+[data.Position, info.Position] = ros.internal.ros.messages.ros.default_type('double',NaN);
+[data.Velocity, info.Velocity] = ros.internal.ros.messages.ros.default_type('double',NaN);
+[data.Acceleration, info.Acceleration] = ros.internal.ros.messages.ros.default_type('double',NaN);
+[data.Effort, info.Effort] = ros.internal.ros.messages.ros.default_type('double',NaN);
+[data.POSITIONMODE, info.POSITIONMODE] = ros.internal.ros.messages.ros.default_type('int32',1, 1);
+[data.VELOCITYMODE, info.VELOCITYMODE] = ros.internal.ros.messages.ros.default_type('int32',1, 2);
+[data.TORQUEMODE, info.TORQUEMODE] = ros.internal.ros.messages.ros.default_type('int32',1, 3);
+[data.TRAJECTORYMODE, info.TRAJECTORYMODE] = ros.internal.ros.messages.ros.default_type('int32',1, 4);
+info.MessageType = 'intera_core_msgs/JointCommand';
+info.constant = 0;
+info.default = 0;
+info.maxstrlen = NaN;
+info.MaxLen = 1;
+info.MinLen = 1;
+info.MatPath = cell(1,16);
+info.MatPath{1} = 'header';
+info.MatPath{2} = 'header.seq';
+info.MatPath{3} = 'header.stamp';
+info.MatPath{4} = 'header.stamp.sec';
+info.MatPath{5} = 'header.stamp.nsec';
+info.MatPath{6} = 'header.frame_id';
+info.MatPath{7} = 'mode';
+info.MatPath{8} = 'names';
+info.MatPath{9} = 'position';
+info.MatPath{10} = 'velocity';
+info.MatPath{11} = 'acceleration';
+info.MatPath{12} = 'effort';
+info.MatPath{13} = 'POSITION_MODE';
+info.MatPath{14} = 'VELOCITY_MODE';
+info.MatPath{15} = 'TORQUE_MODE';
+info.MatPath{16} = 'TRAJECTORY_MODE';

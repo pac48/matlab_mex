@@ -1,0 +1,155 @@
+ROS_DISTRO was set to 'humble' before. Please make sure that the environment does not mix paths from different distributions.
+-- The C compiler identification is GNU 10.4.0
+-- The CXX compiler identification is GNU 10.4.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Using CATKIN_DEVEL_PREFIX: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/devel
+-- Using CMAKE_PREFIX_PATH: /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1;/usr/local/MATLAB/R2022b/toolbox/ros/mlroscpp/custom_messages
+-- This workspace overlays: /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1;/usr/local/MATLAB/R2022b/toolbox/ros/mlroscpp/custom_messages
+-- Found PythonInterp: /home/pac48/.matlab/R2022b/ros1/glnxa64/venv/bin/python3 (found suitable version "3.9.15", minimum required is "3") 
+-- Using PYTHON_EXECUTABLE: /home/pac48/.matlab/R2022b/ros1/glnxa64/venv/bin/python3
+-- Using Debian Python package layout
+-- Using empy: /usr/bin/empy
+-- Using CATKIN_ENABLE_TESTING: off
+-- catkin 0.8.10
+-- BUILD_SHARED_LIBS is on
+-- BUILD_SHARED_LIBS is on
+-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-- ~~  traversing 1 packages in topological order:
+-- ~~  - intera_core_msgs
+-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-- +++ processing catkin package: 'intera_core_msgs'
+-- ==> add_subdirectory(intera_core_msgs)
+CMake Warning at /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/share/genmsg/cmake/genmsg-extras.cmake:49 (message):
+  Unknown message generator specified in ROS_LANG_DISABLE: geneus
+Call Stack (most recent call first):
+  /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/share/genmsg/cmake/genmsgConfig.cmake:222 (include)
+  /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/share/gencpp/cmake/gencppConfig.cmake:197 (find_package)
+  /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/share/message_generation/cmake/message_generationConfig.cmake:197 (find_package)
+  /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/share/catkin/cmake/catkinConfig.cmake:76 (find_package)
+  intera_core_msgs/CMakeLists.txt:20 (find_package)
+
+
+CMake Warning at /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/share/genmsg/cmake/genmsg-extras.cmake:49 (message):
+  Unknown message generator specified in ROS_LANG_DISABLE: genlisp
+Call Stack (most recent call first):
+  /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/share/genmsg/cmake/genmsgConfig.cmake:222 (include)
+  /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/share/gencpp/cmake/gencppConfig.cmake:197 (find_package)
+  /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/share/message_generation/cmake/message_generationConfig.cmake:197 (find_package)
+  /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/share/catkin/cmake/catkinConfig.cmake:76 (find_package)
+  intera_core_msgs/CMakeLists.txt:20 (find_package)
+
+
+CMake Warning at /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/share/genmsg/cmake/genmsg-extras.cmake:49 (message):
+  Unknown message generator specified in ROS_LANG_DISABLE: gennodejs
+Call Stack (most recent call first):
+  /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/share/genmsg/cmake/genmsgConfig.cmake:222 (include)
+  /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/share/gencpp/cmake/gencppConfig.cmake:197 (find_package)
+  /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/share/message_generation/cmake/message_generationConfig.cmake:197 (find_package)
+  /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/share/catkin/cmake/catkinConfig.cmake:76 (find_package)
+  intera_core_msgs/CMakeLists.txt:20 (find_package)
+
+
+-- Using these message generators: gencpp;genpy
+-- intera_core_msgs: 1 messages, 0 services
+-- Configuring done
+-- Generating done
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    Boost_NAMESPACE
+
+
+-- Build files have been written to: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/build
+[1/7] cd /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/build/intera_core_msgs && /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/build/catkin_generated/env_cached.sh /home/pac48/.matlab/R2022b/ros1/glnxa64/venv/bin/python3 /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/share/genmsg/cmake/../../../lib/genmsg/genmsg_check_deps.py intera_core_msgs /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/src/intera_core_msgs/msg/JointCommand.msg std_msgs/Header
+[2/7] Generating C++ code from intera_core_msgs/JointCommand.msg
+[3/7] Generating Python from MSG intera_core_msgs/JointCommand
+[4/7] Generating Python msg __init__.py for intera_core_msgs
+[5/7] Building CXX object intera_core_msgs/CMakeFiles/intera_core_msgs_matlab.dir/src/intera_core_msgs_JointCommand_message.cpp.o
+In file included from /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/boost/include/boost/smart_ptr/detail/sp_thread_sleep.hpp:22,
+                 from /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/boost/include/boost/smart_ptr/detail/yield_k.hpp:23,
+                 from /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/boost/include/boost/smart_ptr/detail/spinlock_gcc_atomic.hpp:14,
+                 from /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/boost/include/boost/smart_ptr/detail/spinlock.hpp:42,
+                 from /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/boost/include/boost/smart_ptr/detail/spinlock_pool.hpp:25,
+                 from /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/boost/include/boost/smart_ptr/shared_ptr.hpp:65,
+                 from /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/boost/include/boost/shared_ptr.hpp:53,
+                 from /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/boost/include/boost/date_time/time_clock.hpp:53,
+                 from /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/boost/include/boost/date_time/posix_time/posix_time_types.hpp:46,
+                 from /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/boost/include/boost/date_time/posix_time/time_formatters.hpp:52,
+                 from /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/boost/include/boost/date_time/posix_time/posix_time.hpp:60,
+                 from /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/boost/include/boost/date_time/local_time/local_time.hpp:47,
+                 from /usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/boost/include/boost/date_time.hpp:51,
+                 from /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/src/intera_core_msgs/src/intera_core_msgs_JointCommand_message.cpp:3:
+/usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/boost/include/boost/bind.hpp:72:1: note: ‘#pragma message: The practice of declaring the Bind placeholders (_1, _2, ...) in the global namespace is deprecated. Please use <boost/bind/bind.hpp> + using namespace mwboost::placeholders, or define BOOST_BIND_GLOBAL_PLACEHOLDERS to retain the current behavior.’
+   72 | BOOST_PRAGMA_MESSAGE(
+      | ^~~~~~~~~~~~~~~~~~~~
+[6/7] Linking CXX shared library /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/devel/lib/libintera_core_msgs_matlab.so
+[6/7] Install the project...
+-- Install configuration: "Release"
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/_setup_util.py
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/env.sh
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/setup.bash
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/local_setup.bash
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/setup.sh
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/local_setup.sh
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/setup.zsh
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/local_setup.zsh
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/.rosinstall
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/share/intera_core_msgs/msg/JointCommand.msg
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/share/intera_core_msgs/cmake/intera_core_msgs-msg-paths.cmake
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/include/intera_core_msgs
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/include/intera_core_msgs/JointCommand.h
+Listing '/home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/devel/lib/python3/dist-packages/intera_core_msgs'...
+Compiling '/home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/devel/lib/python3/dist-packages/intera_core_msgs/__init__.py'...
+Listing '/home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/devel/lib/python3/dist-packages/intera_core_msgs/msg'...
+Compiling '/home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/devel/lib/python3/dist-packages/intera_core_msgs/msg/_JointCommand.py'...
+Compiling '/home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/devel/lib/python3/dist-packages/intera_core_msgs/msg/__init__.py'...
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/lib/python3/dist-packages/intera_core_msgs
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/lib/python3/dist-packages/intera_core_msgs/__pycache__
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/lib/python3/dist-packages/intera_core_msgs/__pycache__/__init__.cpython-39.pyc
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/lib/python3/dist-packages/intera_core_msgs/msg
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/lib/python3/dist-packages/intera_core_msgs/msg/_JointCommand.py
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/lib/python3/dist-packages/intera_core_msgs/msg/__pycache__
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/lib/python3/dist-packages/intera_core_msgs/msg/__pycache__/__init__.cpython-39.pyc
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/lib/python3/dist-packages/intera_core_msgs/msg/__pycache__/_JointCommand.cpython-39.pyc
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/lib/python3/dist-packages/intera_core_msgs/msg/__init__.py
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/lib/python3/dist-packages/intera_core_msgs/__init__.py
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/lib/pkgconfig/intera_core_msgs.pc
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/share/intera_core_msgs/cmake/intera_core_msgs-msg-extras.cmake
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/share/intera_core_msgs/cmake/intera_core_msgsConfig.cmake
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/share/intera_core_msgs/cmake/intera_core_msgsConfig-version.cmake
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/share/intera_core_msgs/package.xml
+-- Up-to-date: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/include
+-- Up-to-date: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/include/intera_core_msgs
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/include/intera_core_msgs/visibility_control.h
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/lib/libintera_core_msgs_matlab.so
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/m/
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/m//+ros
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/m//+ros/+internal
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/m//+ros/+internal/+ros
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/m//+ros/+internal/+ros/+custommessages
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/m//+ros/+internal/+ros/+custommessages/+intera_core_msgs
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/m//+ros/+internal/+ros/+custommessages/+intera_core_msgs/jointCommand.m
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/m//+ros/+msggen
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/m//+ros/+msggen/+intera_core_msgs
+-- Installing: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install/m//+ros/+msggen/+intera_core_msgs/JointCommand.m
+Base path: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64
+Source space: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/src
+Build space: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/build
+Devel space: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/devel
+Install space: /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install
+Creating symlink "/home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/src/CMakeLists.txt" pointing to "/usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1/share/catkin/cmake/toplevel.cmake"
+####
+#### Running command: "cmake /home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/src -DALIAS_ROS1_CLASS_LOADER=1 -DBoost_NAMESPACE=mwboost -DCATKIN_ENABLE_TESTING=off -DCMAKE_PREFIX_PATH=/usr/local/MATLAB/R2022b/sys/ros1/glnxa64/ros1;/usr/local/MATLAB/R2022b/toolbox/ros/mlroscpp/custom_messages -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS_RELEASE=-O0 -DCATKIN_DEVEL_PREFIX=/home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/devel -DCMAKE_INSTALL_PREFIX=/home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/install -G Ninja" in "/home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/build"
+####
+####
+#### Running command: "ninja install install -j32 -l32" in "/home/pac48/matlab_mex/yumiMatlab/rosCustomMessages/matlab_msg_gen_ros1/glnxa64/build"
+####
