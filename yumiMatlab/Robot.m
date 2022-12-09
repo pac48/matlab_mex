@@ -81,7 +81,7 @@ classdef Robot < handle
                 end
             end
 
-            obj.home = arrayfun(@(x) homeDict(x), obj.jointNames);
+            obj.home = cellfun(@(x) homeDict(x), obj.jointNames);
             obj.setJoints(obj.home)
             obj.intervals = cumsum(cellfun(@(x) size(x,1), obj.verts));
             obj.intervals = cat(1,1, obj.intervals);
@@ -149,12 +149,12 @@ classdef Robot < handle
         end
         function setJointsMsg(obj, msg)
             jointAngles = obj.getJoints();
-            map = dictionary(msg.Name, msg.Position);
+            map = containers.Map(msg.Name, msg.Position);
             ind = 0;
             for jointName = obj.jointNames'
                 ind =ind + 1;
                 if map.isKey(jointName)
-                    jointAngles(ind) = map(jointName); 
+                    jointAngles(ind) = map(jointName{1}); 
                 end
             end
             jointAngles = min(jointAngles, obj.jointMaximums);
