@@ -18,6 +18,7 @@ IF(MATLAB_FOUND)
     add_subdirectory(objLoaderMex)
     add_subdirectory(parser)
     add_subdirectory(ZED)
+    add_subdirectory(ZMQ)
 
 ELSE(MATLAB_FOUND)
     message( FATAL_ERROR "MATLAB not found...nothing will be built." )
