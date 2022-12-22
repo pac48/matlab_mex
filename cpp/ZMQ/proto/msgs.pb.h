@@ -68,12 +68,13 @@ namespace MatlabPython {
 enum Type : int {
   FLOAT64 = 0,
   INT32 = 1,
+  UINT8 = 2,
   Type_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
   Type_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
 };
 bool Type_IsValid(int value);
 constexpr Type Type_MIN = FLOAT64;
-constexpr Type Type_MAX = INT32;
+constexpr Type Type_MAX = UINT8;
 constexpr int Type_ARRAYSIZE = Type_MAX + 1;
 
 const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* Type_descriptor();

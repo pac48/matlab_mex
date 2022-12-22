@@ -5,6 +5,7 @@
 %     server = ZMQ_Server(5556, 100);
 %     clear all;
 % end
+global server
 
 server = ZMQ_Server(5555, 100, 'numpy');
 
@@ -16,3 +17,22 @@ mat.*mat
 % matP = permute(mat,flip(1:length(size(mat))) );
 server.send(mat);
 
+t = timer(Period=.1, ExecutionMode='fixedRate');
+t.TimerFcn = @(x,y) printServer();
+start(t)
+
+
+% while 1
+% disp(server.recv());
+% end
+
+
+%% clean up
+stop(timerfind)
+pause(.1)
+clear all
+
+function printServer()
+global server
+disp(server.recv())
+end

@@ -60,8 +60,9 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 const char descriptor_table_protodef_msgs_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\nmsgs.proto\022\014MatlabPython\"W\n\005Numpy\022\020\n\010n"
   "um_dims\030\001 \001(\005\022\014\n\004dims\030\002 \003(\005\022 \n\004type\030\003 \001("
-  "\0162\022.MatlabPython.Type\022\014\n\004data\030\004 \001(\014*\036\n\004T"
-  "ype\022\013\n\007FLOAT64\020\000\022\t\n\005INT32\020\001b\006proto3"
+  "\0162\022.MatlabPython.Type\022\014\n\004data\030\004 \001(\014*)\n\004T"
+  "ype\022\013\n\007FLOAT64\020\000\022\t\n\005INT32\020\001\022\t\n\005UINT8\020\002b\006"
+  "proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_msgs_2eproto_deps[1] = {
 };
@@ -70,7 +71,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_msg
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_msgs_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_msgs_2eproto = {
-  false, false, descriptor_table_protodef_msgs_2eproto, "msgs.proto", 155,
+  false, false, descriptor_table_protodef_msgs_2eproto, "msgs.proto", 166,
   &descriptor_table_msgs_2eproto_once, descriptor_table_msgs_2eproto_sccs, descriptor_table_msgs_2eproto_deps, 1, 0,
   schemas, file_default_instances, TableStruct_msgs_2eproto::offsets,
   file_level_metadata_msgs_2eproto, 1, file_level_enum_descriptors_msgs_2eproto, file_level_service_descriptors_msgs_2eproto,
@@ -87,6 +88,7 @@ bool Type_IsValid(int value) {
   switch (value) {
     case 0:
     case 1:
+    case 2:
       return true;
     default:
       return false;

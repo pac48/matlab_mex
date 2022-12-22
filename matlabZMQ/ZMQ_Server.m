@@ -7,6 +7,7 @@ classdef ZMQ_Server < handle
         CLOSE = 1;
         RECV = 2;
         SEND = 3;
+        HAS_NEW_MSG = 4;
     end
 
     properties
@@ -16,7 +17,7 @@ classdef ZMQ_Server < handle
     methods
         function obj = ZMQ_Server(port, period, topic)
             obj.ptr = mexZMQ(obj.INIT, port, period, topic);
-
+            pause(1)
         end
 
         function send(obj,arr)
@@ -24,7 +25,14 @@ classdef ZMQ_Server < handle
         end
 
         function arr = recv(obj)
-            arr = mexZMQ(obj.RECV, obj.ptr);
+            arr = [];
+            if (obj.hasNewMsg())
+                arr = mexZMQ(obj.RECV, obj.ptr);
+                arr = permute(arr, flip(1:length(size(arr ))) );
+            end
+        end
+        function bool = hasNewMsg(obj)
+            bool = mexZMQ(obj.HAS_NEW_MSG, obj.ptr) ~= 0;
         end
 
         function delete(obj)
