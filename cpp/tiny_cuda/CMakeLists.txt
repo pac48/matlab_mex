@@ -1,6 +1,8 @@
 set(TARGET tiny_cuda_mex)
 
 SET(CMAKE_BUILD_TYPE Debug)
+
+set(MATLAB_ROOT /media/paul/Matlab2022b/MATLAB/R2022b)
 #SET(CMAKE_BUILD_TYPE RelWithDebInfo)
 
 #set(CUDA_NVCC_EXECUTABLE "/usr/local/cuda-12.0/bin/nvcc")
@@ -8,8 +10,9 @@ SET(CMAKE_BUILD_TYPE Debug)
 
 find_package(CUDA REQUIRED)
 find_package(nlohmann_json REQUIRED)
-find_library(TINY_CUDA_LIBRARY tiny-cuda-nn)
+
 find_library(FMT_LIBRARIES fmt)
+find_library(TINY_CUDA_LIBRARY tiny-cuda-nn)
 
 option(TCNN_ALLOW_CUBLAS_CUSOLVER "Allows tiny-cuda-nn to use cuBLAS and cuSolver. Only required for the Shampoo optimizer." OFF)
 #set(MIN_GPU_ARCH 89)
@@ -22,9 +25,13 @@ if (TCNN_ALLOW_CUBLAS_CUSOLVER AND CUDA_VERSION VERSION_GREATER_EQUAL 11.0)
     list(APPEND TCNN_DEFINITIONS -DTCNN_SHAMPOO)
 endif()
 
-#add_library(${TARGET} SHARED tiny_cuda_mex.cpp ${CMAKE_SOURCE_DIR}/Matlabdef.def)
-#set_source_files_properties(tiny_cuda_mex.cpp PROPERTIES LANGUAGE CUDA)
-add_executable(${TARGET} tiny_cuda_mex.cpp ${CMAKE_SOURCE_DIR}/Matlabdef.def)
+include_directories(${CUDA_INCLUDE_DIRS})
+include_directories(${MATLAB_INCLUDE_DIR})
+include_directories(${MATLAB_ROOT}/toolbox/parallel/gpu/extern/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+add_library(${TARGET} SHARED tiny_cuda_mex.cpp ${CMAKE_SOURCE_DIR}/Matlabdef.def)
+#add_executable(${TARGET} tiny_cuda_mex.cpp ${CMAKE_SOURCE_DIR}/Matlabdef.def)
 
 add_definitions(-std=c++17)
 
@@ -34,13 +41,10 @@ target_link_libraries(${TARGET}
         ${CUDA_LIBRARIES}
         ${TCNN_LIBRARIES}
         ${FMT_LIBRARIES}
+        ${MATLAB_ROOT}/bin/glnxa64/libmwgpu.so
         )
 target_compile_definitions(${TARGET} PUBLIC ${TCNN_DEFINITIONS})
 set_target_properties(${TARGET} PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-
-include_directories(${CUDA_INCLUDE_DIRS})
-include_directories(${MATLAB_INCLUDE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 
 if(WIN32)

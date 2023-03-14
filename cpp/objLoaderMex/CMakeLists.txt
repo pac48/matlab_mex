@@ -1,7 +1,9 @@
 set(TARGET object_loader)
 
 
-SET(CMAKE_BUILD_TYPE Release)
+#SET(CMAKE_BUILD_TYPE Release)
+SET(CMAKE_BUILD_TYPE Debug)
+
 
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
