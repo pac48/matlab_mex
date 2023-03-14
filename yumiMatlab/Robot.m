@@ -38,7 +38,7 @@ classdef Robot < handle
         numEndEffector
         jointMinimums
         jointMaximums
-        home 
+        home
         bodies
         armInds
         armVerts2Body
@@ -149,17 +149,41 @@ classdef Robot < handle
         end
         function setJointsMsg(obj, msg)
             jointAngles = obj.getJoints();
-            map = containers.Map(msg.Name, msg.Position);
+            if isfield(msg, 'Name')
+                names = msg.Name;
+            else
+                names = msg.Names;
+            end
+
+            map = containers.Map(names, msg.Position);
             ind = 0;
             for jointName = obj.jointNames'
-                ind =ind + 1;
+                ind = ind + 1;
                 if map.isKey(jointName)
-                    jointAngles(ind) = map(jointName{1}); 
+                    jointAngles(ind) = map(jointName{1});
                 end
             end
             jointAngles = min(jointAngles, obj.jointMaximums);
             jointAngles = max(jointAngles, obj.jointMinimums);
             robot_mex(obj.SETJOINTS, obj.robotPtr, jointAngles);
+        end
+        function jointVel = getJointsVelfromMsg(obj, msg)
+            jointVel = 0*obj.getJoints();
+            if isfield(msg, 'Name')
+                names = msg.Name;
+            else
+                names = msg.Names;
+            end
+
+            map = containers.Map(names, msg.Velocity);
+            ind = 0;
+            for jointName = obj.jointNames'
+                ind = ind + 1;
+                if map.isKey(jointName)
+                    jointVel(ind) = map(jointName{1});
+                end
+            end
+
         end
         function jointAgnles = getJoints(obj)
             jointAgnles = robot_mex(obj.GETJOINTS, obj.robotPtr);
@@ -168,6 +192,10 @@ classdef Robot < handle
             J = robot_mex(obj.GETJACOB, obj.robotPtr);
         end
         function T = getBodyTransform(obj, index)
+            if isa(index, 'char')
+                index = find(contains(obj.bodyNames, index), 1);
+            end
+
             T = robot_mex(obj.GETBODYTRANS, obj.robotPtr, index);
         end
         function T = getJointTransform(obj, index)
@@ -254,9 +282,24 @@ classdef Robot < handle
         %                 Jall{j} = J;
         %             end
         %         end
-        function JControl = getControlPointsJacobians(obj)
+
+        function setControlPointfromBodyName(obj, bodyNames)
+            obj.controlPoints = zeros(3, length(bodyNames));
+            obj.controlBodyInds = zeros(length(bodyNames), 1);
+            for i =  1: length(bodyNames)
+                bodyName = bodyNames{i};
+                index = find(contains(obj.bodyNames, bodyName), 1);
+                obj.controlBodyInds(i) = index;
+                T = obj.getBodyTransform(index);
+                point = T(1:3, end);
+                obj.controlPoints(:,i) = point;
+            end
+        end
+        function varargout = getControlPointsJacobians(obj, bodyNames)
+            obj.setControlPointfromBodyName(bodyNames)
             JControlPoints = obj.getPointJacobians(obj.controlPoints, obj.controlBodyInds);
-            JControl = JControlPoints{1};
+            %             JControl = JControlPoints{1};
+            varargout = JControlPoints;
         end
 
         function JVerts = getPointJacobians(obj, controlPoints, bodyInds)
@@ -273,7 +316,7 @@ classdef Robot < handle
 
             for j = 1:length(JVerts)
                 b = bodyInds(j); %obj.armVerts2Body(j);
-%                 b = obj.body2VertMap(obj.bodyNames{bodyInds(j)});
+                %                 b = obj.body2VertMap(obj.bodyNames{bodyInds(j)});
                 jointIndsb = jointInds{b};
                 jointTypesb = jointTypes{b};
 
@@ -293,6 +336,7 @@ classdef Robot < handle
                         J(4:6, jointIndsb(i)) = T(1:3,3);
                     end
                     if jointTypesb(i) == obj.PRISMATIC
+                        continue % TODO this works but causes problems in pratice 
                         T = obj.getJointTransform(jointIndsb(i));
                         J(1:3, jointIndsb(i)) = -T(1:3,1);
                         J(4:6, jointIndsb(i)) = 0;

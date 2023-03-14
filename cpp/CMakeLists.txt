@@ -19,6 +19,8 @@ IF(MATLAB_FOUND)
     add_subdirectory(parser)
     add_subdirectory(ZED)
     add_subdirectory(ZMQ)
+#    enable_language(CUDA)
+    add_subdirectory(tiny_cuda)
 
 ELSE(MATLAB_FOUND)
     message( FATAL_ERROR "MATLAB not found...nothing will be built." )

@@ -47,8 +47,3 @@ endif (WIN32)
 
 install(TARGETS ${TARGET} DESTINATION ${CMAKE_SOURCE_DIR}/../mex)
 message("Done!!!: " ${TARGET})
-
-get_cmake_property(_variableNames VARIABLES)
-foreach (_variableName ${_variableNames})
-  message(STATUS "${_variableName}=${${_variableName}}")
-endforeach ()

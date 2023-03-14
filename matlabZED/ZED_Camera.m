@@ -28,7 +28,7 @@ classdef ZED_Camera < handle
             obj.InitParameters.depth_mode = 1; %PERFORMANCE
             %InitParameters.svo_input_filename = '../mySVOfile.svo'; % Enable SVO playback
             obj.InitParameters.depth_maximum_distance = 7;% Define maximum depth (in METER)
-            %             obj.requested_depth_size = [720 404];
+                        obj.requested_depth_size = [720 404];
             obj.InitParameters.coordinate_system = 3; %COORDINATE_SYSTEM_RIGHT_HANDED_Z_UP
 
             if ~mexZED('isOpened')

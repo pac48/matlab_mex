@@ -48,7 +48,7 @@ key = 1;
 % loop over frames, till Esc is pressed
 while (key ~= 27)
     % grab the current image and compute the depth
-    [image_left, image_right] =zed.read_stereo();
+    [image_left, image_right] = zed.read_stereo();
     %             % retrieve letf image
     %             image_left = mexZED('retrieveImage', 0); %left
     %             % retrieve right image

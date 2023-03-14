@@ -10,23 +10,63 @@ classdef ZMQ_Server < handle
         HAS_NEW_MSG = 4;
     end
 
+    properties(Access=private)
+        messageOut
+    end
+
     properties
         ptr
+        port 
+        period 
+        topic
+    end
+
+    methods(Static)
+        function lobj = loadobj(obj)
+            obj.ptr = mexZMQ(obj.INIT, obj.port, obj.period, obj.topic);
+            obj.messageOut = false;
+            pause(1)
+            lobj = obj;
+        end
     end
 
     methods
         function obj = ZMQ_Server(port, period, topic)
+            obj.port = port;
+            obj.period = period;
+            obj.topic = topic;
             obj.ptr = mexZMQ(obj.INIT, port, period, topic);
+            obj.messageOut = false;
             pause(1)
         end
 
-        function send(obj,arr)
+        function sobj = saveobj(obj)
+            % Call superclass saveobj method
+%             sobj = saveobj@handle(obj);
+%             obj.ptr = [];
+%             obj.messageOut = [];
+            sobj = obj;
+        end
+
+        function send(obj, arr)
+            if(obj.messageOut)
+                warning('only one message can be out at a time');
+                out = [];
+                ind = 0;
+                while isempty(out) && ind < 10
+                    out = recv(obj);
+                    ind = ind + 1;
+                    pause(.1)
+                end
+            end
             mexZMQ(obj.SEND, obj.ptr, arr);
+            obj.messageOut = true;
         end
 
         function arr = recv(obj)
             arr = [];
             if (obj.hasNewMsg())
+                obj.messageOut = false;
                 arr = mexZMQ(obj.RECV, obj.ptr);
                 arr = permute(arr, flip(1:length(size(arr ))) );
             end
