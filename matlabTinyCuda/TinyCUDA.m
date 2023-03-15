@@ -9,29 +9,23 @@ classdef TinyCUDA < handle
         BACKWARD = 3;
         NUM_PARAMS = 4;
     end
-    properties
+    properties(Access=private)
         ptr
         params
     end
 
     methods
         function obj = TinyCUDA()
-%             encoding.base_resolution = 16;
-%             encoding.log2_hashmap_size = 19;
-%             encoding.n_features_per_level = 2;
-%             encoding.n_levels = 16;
-%             encoding.otype = 'HashGrid';
-%             encoding.per_level_scale = 2;
-            encoding.otype =  'OneBlob';
-            encoding.n_bins = 64;
+            encoding.otype = 'OneBlob';
+            encoding.n_bins = 32;
 
             network.activation = 'ReLU';
-            network.n_hidden_layers = 5;
+            network.n_hidden_layers = 3;
             network.n_neurons = 128;
             network.otype = 'FullyFusedMLP';
             network.output_activation= 'None';
 
-            optimizer.learning_rate = 1E-3;            
+            optimizer.learning_rate = 1E-3;
             optimizer.otype = 'Adam';
 
             s.encoding = encoding;
@@ -48,14 +42,33 @@ classdef TinyCUDA < handle
             obj.params = gpuArray(.1*(rand(num_params, 1,'single')-.5) );
         end
 
-        function outputs = forward(obj, inputs) 
+        function outputs = forward(obj, inputs)
+            if ~isa(inputs, 'gpuArray')
+                assert(0)
+            end
             outputs = tiny_cuda_mex(obj.FORWARD, obj.ptr, obj.params, inputs);
-                
-                
+        end
+
+        function [dL_dinput, dL_dparams]  = backward(obj, input, output, dL_doutput)
+            if ~isa(input, 'gpuArray') || ~isa(output, 'gpuArray') || ~isa(dL_doutput, 'gpuArray')
+                assert(0)
+            end
+            [dL_dinput, dL_dparams] = tiny_cuda_mex(obj.BACKWARD, obj.ptr, dL_doutput, input, output, obj.params);
+        end
+
+        function out = getParams(obj)
+            out = obj.params;
+        end
+
+        function setParams(obj, params)
+            if ~isa(params, 'gpuArray')
+                assert(0)
+            end
+            obj.params = params;
         end
 
         function delete(obj)
-           tiny_cuda_mex(obj.DESTROY, obj.ptr);
+            tiny_cuda_mex(obj.DESTROY, obj.ptr);
         end
     end
 end

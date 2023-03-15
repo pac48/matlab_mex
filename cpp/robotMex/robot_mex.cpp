@@ -136,7 +136,7 @@ public:
 };
 
 
-mdl::Dynamic* getModelPtr(const mxArray* pa){
+mdl::Dynamic* getPairPtr(const mxArray* pa){
   double* pointer0 = mxGetPr(pa);
   mxAssert(pointer0 != NULL, "input must be a valid robot pointer\n");
   intptr_t pointer1 = (intptr_t) pointer0[0];
@@ -260,7 +260,7 @@ void setJoints(int nlhs, mxArray *plhs[],
 
   myAssert(nrhs == 3, "three input argument expected");
   myAssert(nlhs == 0, "no output arguments expected");
-  mdl::Dynamic* model = getModelPtr(prhs[1]);
+  mdl::Dynamic* model = getPairPtr(prhs[1]);
 
   double* jointAngle = (double*) mxGetData(prhs[2]);
   const mwSize* dims = mxGetDimensions(prhs[2]);
@@ -282,7 +282,7 @@ void getJoints(int nlhs, mxArray *plhs[],
 
   myAssert(nrhs == 2, "two input argument expected");
   myAssert(nlhs == 1, "one output arguments expected");
-  mdl::Dynamic* model = getModelPtr(prhs[1]);
+  mdl::Dynamic* model = getPairPtr(prhs[1]);
 
   auto curJoint = model->getPosition();
   plhs[0] = mxCreateDoubleMatrix(curJoint.size(), 1, mxREAL);
@@ -299,7 +299,7 @@ void getOperationalPosition(int nlhs, mxArray *plhs[],
 
   myAssert(nrhs == 3, "two input argument expected");
   myAssert(nlhs == 1, "one output arguments expected");
-  mdl::Dynamic* model = getModelPtr(prhs[1]);
+  mdl::Dynamic* model = getPairPtr(prhs[1]);
 
   int index = mxGetScalar(prhs[2])-1;
   myAssert(index < model->getOperationalDof() && index >= 0, "index out of bounds");
@@ -313,7 +313,7 @@ void getJacobian(int nlhs, mxArray *plhs[],
                  int nrhs, const mxArray *prhs[]){
   myAssert(nrhs == 2, "two input argument expected");
   myAssert(nlhs == 1, "one output arguments expected");
-  mdl::Dynamic* model = getModelPtr(prhs[1]);
+  mdl::Dynamic* model = getPairPtr(prhs[1]);
   int numEE = model->getOperationalDof();
   int numDof = model->getDof();
   math::Matrix J = math::Matrix(6*numEE, numDof);
@@ -414,7 +414,7 @@ void destroy(int nlhs, mxArray *plhs[],
              int nrhs, const mxArray *prhs[] ){
   myAssert(nrhs == 2, "Only two input argument expected");
   myAssert(nlhs == 0, "no output arguments expected");
-  mdl::Dynamic* model = getModelPtr(prhs[1]);
+  mdl::Dynamic* model = getPairPtr(prhs[1]);
   MatlabRobot* robot = getMatlabRobotPtr(prhs[1]);
   printf("deleted robot object\n");
 

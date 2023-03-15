@@ -9,7 +9,6 @@ endif()
 #set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} --expt-relaxed-constexpr")
 
 find_package(CUDA REQUIRED)
-set(CUDA_NVCC_EXECUTABLE "/media/paul/MATLAB2022b/MATLAB/R2022b/sys/cuda/glnxa64/cuda/bin/nvcc")
 find_package(nlohmann_json REQUIRED)
 
 find_library(FMT_LIBRARIES fmt)
@@ -28,11 +27,12 @@ endif()
 
 include_directories(${CUDA_INCLUDE_DIRS})
 include_directories(${MATLAB_INCLUDE_DIR})
-include_directories(${MATLAB_ROOT}/toolbox/parallel/gpu/extern/include)
+include_directories( $ENV{MATLAB_ROOT}/toolbox/parallel/gpu/extern/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_library(${TARGET} SHARED tiny_cuda_mex.cpp ${CMAKE_SOURCE_DIR}/Matlabdef.def)
 #add_executable(${TARGET} tiny_cuda_mex.cpp ${CMAKE_SOURCE_DIR}/Matlabdef.def)
+
 
 add_definitions(-std=c++17)
 
@@ -42,7 +42,7 @@ target_link_libraries(${TARGET}
         ${CUDA_LIBRARIES}
         ${TCNN_LIBRARIES}
         ${FMT_LIBRARIES}
-        ${MATLAB_ROOT}/bin/glnxa64/libmwgpu.so
+        $ENV{MATLAB_ROOT}/bin/glnxa64/libmwgpu.so
         )
 target_compile_definitions(${TARGET} PUBLIC ${TCNN_DEFINITIONS})
 
