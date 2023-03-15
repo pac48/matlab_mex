@@ -45,7 +45,7 @@ classdef TinyCUDA < handle
             obj.ptr = tiny_cuda_mex(obj.INIT, json_str, n_input_dims, n_output_dims);
 
             num_params = tiny_cuda_mex(obj.NUM_PARAMS, obj.ptr);
-            obj.params = gpuArray(rand(num_params, 1,'single'));
+            obj.params = gpuArray(.1*(rand(num_params, 1,'single')-.5) );
         end
 
         function outputs = forward(obj, inputs) 

@@ -1,4 +1,5 @@
 #include "mex.h"
+#include "gpu/mxGPUArray.h"
 
 const int INIT = 0;
 const int DESTROY = 1;
