@@ -2,13 +2,14 @@ project(matlab_mex)
 cmake_minimum_required(VERSION 3.18.2)
 
 SET(CMAKE_BUILD_TYPE Release)
-SET(MATLAB_ROOT ${MATLAB_ROOT} CACHE FILEPATH "directory")
+#SET(MATLAB_ROOT ${MATLAB_ROOT} CACHE FILEPATH "directory")
+set(MATLAB_ROOT /media/paul/MATLAB2022b/MATLAB/R2022b)
 
 set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR})
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 add_definitions(/DMATLAB_MEX_FILE)
-add_definitions(/DMX_COMPAT_32)
+#add_definitions(/DMX_COMPAT_32)
 
 find_package(Matlab REQUIRED)
 

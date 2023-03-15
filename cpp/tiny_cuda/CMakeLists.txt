@@ -2,13 +2,14 @@ set(TARGET tiny_cuda_mex)
 
 SET(CMAKE_BUILD_TYPE Debug)
 
-set(MATLAB_ROOT /media/paul/Matlab2022b/MATLAB/R2022b)
-#SET(CMAKE_BUILD_TYPE RelWithDebInfo)
+if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+    set(CMAKE_CUDA_ARCHITECTURES 70)
+endif()
 
-#set(CUDA_NVCC_EXECUTABLE "/usr/local/cuda-12.0/bin/nvcc")
 #set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} --expt-relaxed-constexpr")
 
 find_package(CUDA REQUIRED)
+set(CUDA_NVCC_EXECUTABLE "/media/paul/MATLAB2022b/MATLAB/R2022b/sys/cuda/glnxa64/cuda/bin/nvcc")
 find_package(nlohmann_json REQUIRED)
 
 find_library(FMT_LIBRARIES fmt)
@@ -44,8 +45,14 @@ target_link_libraries(${TARGET}
         ${MATLAB_ROOT}/bin/glnxa64/libmwgpu.so
         )
 target_compile_definitions(${TARGET} PUBLIC ${TCNN_DEFINITIONS})
-set_target_properties(${TARGET} PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 
+set_target_properties(
+    ${TARGET}
+    PROPERTIES
+    CUDA_SEPERABLE_COMPILATION ON
+#    LINKER_LANGUAGE
+#    CUDA
+)
 
 if(WIN32)
     SET_TARGET_PROPERTIES(${TARGET} PROPERTIES SUFFIX .mexw64)
@@ -56,20 +63,6 @@ else(WIN32)
         SET_TARGET_PROPERTIES(${TARGET} PROPERTIES SUFFIX .mexglx PREFIX "")
     endif (CMAKE_SIZEOF_VOID_P MATCHES "8")
 endif(WIN32)
-
-#find_package(GTest REQUIRED)
-#enable_testing()
-#add_executable(
-#        ${TARGET}_test
-#        test/robot_mex_test.cpp
-#)
-#target_link_libraries(
-#        ${TARGET}_test
-#        ${TARGET}
-#        GTest::gtest_main
-#)
-#include(GoogleTest)
-#gtest_discover_tests(${TARGET}_test)
 
 install(TARGETS ${TARGET} DESTINATION ${CMAKE_SOURCE_DIR}/../mex)
 message(Done!!! ${TARGET})
