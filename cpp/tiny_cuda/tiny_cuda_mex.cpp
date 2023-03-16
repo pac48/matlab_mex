@@ -62,7 +62,8 @@ void init(int nlhs, mxArray *plhs[],
 
     auto encoding_config = config.value("encoding", json::object());
     auto network_config = config.value("network", json::object());
-    auto network = create_network_with_input_encoding(n_input_dims, n_output_dims, encoding_config, network_config);
+//    auto network = create_network_with_input_encoding(n_input_dims, n_output_dims, encoding_config, network_config);
+    auto network = create_network(n_input_dims, n_output_dims, network_config);
 
     plhs[0] = mxCreateDoubleMatrix(1, 1, mxREAL);
     double *ptr = mxGetPr(plhs[0]);
@@ -242,7 +243,8 @@ int main() {
 //    auto [loss, optimizer, network, trainer] =  tcnn::create_from_config(n_input_dims, n_output_dims, config);
     auto encoding_config = config.value("encoding", json::object());
     auto network_config = config.value("network", json::object());
-    auto network = create_network_with_input_encoding(n_input_dims, n_output_dims, encoding_config, network_config);
+//    auto network = create_network_with_input_encoding(n_input_dims, n_output_dims, encoding_config, network_config);
+    auto network = create_network(n_input_dims, n_output_dims, network_config);
 
     float *m_params_full_precision = nullptr;
     bool device_ptr = false;

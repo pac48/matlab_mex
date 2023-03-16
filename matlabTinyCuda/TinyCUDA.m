@@ -20,8 +20,8 @@ classdef TinyCUDA < handle
             encoding.n_bins = 32;
 
             network.activation = 'ReLU';
-            network.n_hidden_layers = 3;
-            network.n_neurons = 128;
+            network.n_hidden_layers = 5;
+            network.n_neurons = 128*4;
             network.otype = 'FullyFusedMLP';
             network.output_activation= 'None';
 
