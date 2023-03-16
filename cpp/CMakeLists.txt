@@ -1,7 +1,7 @@
 project(matlab_mex)
-cmake_minimum_required(VERSION 3.18.2)
+cmake_minimum_required(VERSION 3.22.3)
 
-SET(CMAKE_BUILD_TYPE Release)
+#SET(CMAKE_BUILD_TYPE Release)
 #SET(MATLAB_ROOT ${MATLAB_ROOT} CACHE FILEPATH "directory")
 #set(MATLAB_ROOT /media/paul/MATLAB2022b/MATLAB/R2022b)
 

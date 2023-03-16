@@ -33,6 +33,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_library(${TARGET} SHARED tiny_cuda_mex.cpp ${CMAKE_SOURCE_DIR}/Matlabdef.def)
 #add_executable(${TARGET} tiny_cuda_mex.cpp ${CMAKE_SOURCE_DIR}/Matlabdef.def)
 
+message("ddddddddddd" $ENV{MATLAB_ROOT})
 
 add_definitions(-std=c++17)
 
