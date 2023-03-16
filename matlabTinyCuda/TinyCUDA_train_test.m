@@ -17,23 +17,27 @@ options = optimoptions("fmincon", ...
 %     'HessianFcn', []);
 
 %% data
-x = linspace(-1, 1.0, 32*4);
+x = linspace(-1, 1, 32*2);
 [X,Y] = meshgrid(x);
-edgeInds = X==1 | Y==1 | Y==-1 | X==-1;
 
-U = X.*exp(-(2*X).^2-(2*Y).^2);
-U = U*0;
+% U = (X-2).*exp(-(2*(X-2)).^2-(2*(Y-2)).^2);
+U = zeros(size(X));
+
+edgeInds = X==1 | Y==1 | Y==-1 | X==-1;
 U(edgeInds) = -.1;
 
-U(100:104, 100:104) = .1;
-edgeInds(100:104, 100:104) = 1;
 
-U(44:56, 44:56) = -.1;
-edgeInds(44:56, 44:56) = 1;
+tmp = (X>.55 & X<.62) & (Y>.55 & Y<.62);
+U(tmp) = .1;
+edgeInds(tmp) = 1;
 
+tmp = (X>-.3 & X<-.1) & (Y>-.3 & Y<-.1);
+U(tmp) = -.1;
+edgeInds(tmp) = 1;
 
-% U(44:56, (44:56)+50) = -.1;
-% edgeInds(44:56, (44:56)+50) = 1;
+tmp = (X>.3 & X<.5) & (Y>-.3 & Y<-.1);
+U(tmp) = -.1;
+edgeInds(tmp) = 1;
 
 
 edgeInds = reshape(edgeInds, 1,[]);
@@ -63,18 +67,20 @@ params = gpuArray(single(params0));
 %% train
 population = 1:size(XGpu,2);
 
-delta = 0.00005;
+delta = (x(2)-x(1));%0.05;
 batch_size = 128;
-factor2 = .001*(1/batch_size);
+factor2 = .05*(1/batch_size);
+factor3 = 10;
 
 uDiff = gpuArray(zeros(16, batch_size, 'single'));
 dL_dUpred1 = gpuArray(zeros(16, batch_size, 5, 'single'));
 dL_dUpred2 = gpuArray(zeros(16, batch_size, 5, 'single'));
+dL_dUpred3 = gpuArray(zeros(16, batch_size, 5, 'single'));
 
 XGpuAll = cat(3, XGpu, XGpu+[delta;0], XGpu+[-delta;0], XGpu+[0; delta], XGpu+[0; -delta]);
 
 
-for i = 1:2000
+for i = 1:10000
     inds = randsample(s, population, batch_size);
     XGpui = XGpuAll(:, inds, :);
     UGpui = UGpu(:, inds);
@@ -86,31 +92,53 @@ for i = 1:2000
 
     uDiff(:, :) = (UPred(:, :, 1) - UGpui).*edgeIndsi;
     uDiff(2:end,:) = 0;
-    factor1 = 1;%(10/(1+sum(edgeIndsi)));
+%     factor1 = 3;%(10/(1+sum(edgeIndsi)));
+    factor1 = 10/(.1+sum(edgeIndsi));
     loss1 = factor1*sum((uDiff).^2, 'all');
     dL_dUpred1(:, :, 1) = factor1*2*uDiff;
 
-%     L = (UPred(:, :, 5) + UPred(:, :, 4) +  UPred(:, :, 3) + UPred(:, :, 2) - 4*UPred(:, :, 1))./delta;
-    Lx = ((UPred(:, :, 2)-UPred(:, :, 1)) - (UPred(:, :, 1)-UPred(:, :, 3)) )./delta^2;
-    Ly = ((UPred(:, :, 4)-UPred(:, :, 1))  - (UPred(:, :, 1)-UPred(:, :, 5)))./delta^2;
+%     dt = 0.001;
+%     L = (UPred(:, :, 5) + UPred(:, :, 4) +  UPred(:, :, 3) + UPred(:, :, 2) - 4*UPred(:, :, 1) )./delta.^2;
 
-    L = Lx+Ly;
+    w = exp(UPred(:,:,2:end))./sum(exp(UPred(:,:,2:end)),3);
+%     w = exp(w)./sum(exp(w),3);
+%     w = exp(w)./sum(exp(w),3);
+    L = (w(:,:,4).*UPred(:, :, 5) + w(:,:,3).*UPred(:, :, 4) +  w(:,:,2).*UPred(:, :, 3) + w(:,:,1).*UPred(:, :, 2) - 4*UPred(:, :, 1) );
+    
+
+%     UPredMax = max(UPred(:,:,2:end),[], 3);
+%     UPredMin = min(UPred(:,:,2:end),[], 3);
+%     L = (4*.99*UPredMax + 4*.01*UPredMin - 4*UPred(:, :, 1) )./delta.^2; 
+%     L = (4*UPredMax - 4*UPred(:, :, 1) )./delta.^2; 
+    
+%     L = dt*L;
+
+    %     Lx = ((UPred(:, :, 2)-UPred(:, :, 1)) - (UPred(:, :, 1)-UPred(:, :, 3)) )./delta^2;
+%     Ly = ((UPred(:, :, 4)-UPred(:, :, 1))  - (UPred(:, :, 1)-UPred(:, :, 5)))./delta^2;
+%     L = dt*(Lx+Ly);
+
     L = L.*(1-edgeIndsi);
     L(2:end,:) = 0;
-
     loss2 = factor2*sum((L).^2, 'all');
     dL_dUpred2(:,:,1) = factor2*(-4)*2*L;
-    dL_dUpred2(:,:, 2) = factor2*(1)*2*L;
-    dL_dUpred2(:,:, 3) = factor2*(1)*2*L;
-    dL_dUpred2(:,:, 4) = factor2*(1)*2*L;
-    dL_dUpred2(:,:, 5) = factor2*(1)*2*L;
+
+
+    UPredMax = max(UPred(:,:,2:end),[], 3);
+    maxViolation = UPred > UPredMax;
+    maxViolation = maxViolation.*(1-edgeIndsi);
+    Udiff2 = maxViolation.*(UPred - (-.1));
+    Udiff2(2:end,:) = 0;
+    loss3 = factor3*sum((Udiff2).^2, 'all'); 
+    dL_dUpred3 = factor3*2*Udiff2;
     
     
-    dL_dUpred = dL_dUpred1 + dL_dUpred2;
+    dL_dUpred = dL_dUpred1 + dL_dUpred2 + dL_dUpred3;
     [dL_dX, dL_dparams]  = tc.backward(reshape(XGpui, 2, []), reshape(UPred, 16,[]), reshape(dL_dUpred, 16,[]));
 
     if (mod(i, 20)) == 0
-        loss = double(gather(loss1)) + double(gather(loss2))
+        loss3 = double(gather(loss3))
+        loss2 = double(gather(loss2))
+         loss1 = double(gather(loss1))
     end
     params = params - .1*dL_dparams;
 
@@ -144,7 +172,7 @@ subplot(1,2,2)
 % surf(X, Y, UPred)
 surf(X, Y, UPred)
 
-figure(2);contourf(UPred, 100)
+figure(2);contourf(X, Y,UPred, 100)
 
 % figure
 % surf(X, Y, reshape(gather(UGpu), size(Y) ))

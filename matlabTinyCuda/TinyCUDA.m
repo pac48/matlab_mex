@@ -21,7 +21,7 @@ classdef TinyCUDA < handle
 
             network.activation = 'ReLU';
             network.n_hidden_layers = 4;
-            network.n_neurons = 256*2;
+            network.n_neurons = 128*4;
             network.otype = 'FullyFusedMLP';
             network.output_activation= 'None';
 
